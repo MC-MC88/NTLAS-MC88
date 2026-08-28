@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+<meta name="theme-color" content="#00d2ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Ntlas — Générateur QR Pro Gratuit</title>
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23081019'/%3E%3Cg fill='none' stroke='%2300d2ff' stroke-width='6' stroke-linecap='round'%3E%3Cpath d='M10 24V14a4 4 0 0 1 4-4h10'/%3E%3Cpath d='M54 24V14a4 4 0 0 0-4-4H40'/%3E%3Cpath d='M10 40v10a4 4 0 0 0 4 4h10'/%3E%3Cpath d='M54 40v10a4 4 0 0 1-4 4H40'/%3E%3C/g%3E%3Crect x='27' y='27' width='10' height='10' rx='2' fill='%2300d2ff'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+/* ============ Design tokens ============ */
+:root{
+  --neon:#00d2ff;
+  --accent:#00d2ff;
+  --accent-2:#7b5cff;
+
+  --bg1:#060910;
+  --bg2:#0c1626;
+  --bg3:#0a1d2e;
+  --text:#f5f8fc;
+  --text-dim:rgba(245,248,252,.68);
+  --glass:rgba(255,255,255,.07);
+  --glass-strong:rgba(255,255,255,.11);
+  --glass-border:rgba(255,255,255,.16);
+  --field-bg:rgba(0,0,0,.42);
+  --shadow:0 25px 60px rgba(0,0,0,.55);
+  --grid-dot:rgba(255,255,255,.05);
+}
+html[data-theme="light"]{
+  --bg1:#eaf3fb;
+  --bg2:#dbeafb;
+  --bg3:#e9e2fb;
+  --text:#0c1726;
+  --text-dim:rgba(12,23,38,.65);
+  --glass:rgba(255,255,255,.55);
+  --glass-strong:rgba(255,255,255,.72);
+  --glass-border:rgba(12,23,38,.12);
+  --field-bg:rgba(255,255,255,.65);
+  --shadow:0 25px 60px rgba(20,45,80,.16);
+  --grid-dot:rgba(12,23,38,.06);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',system-ui,sans-serif;}
+html{scroll-behavior:smooth;}
+body{min-height:100dvh;background:var(--bg1);color:var(--text);display:flex;flex-direction:column;overflow-x:hidden;transition:background .4s ease,color .4s ease;}
+
+/* ============ Ambient gradient background (replaces video) ============ */
+.bg-scene{position:fixed;inset:0;z-index:-2;overflow:hidden;background:var(--bg1);}
+.bg-scene::before{
+  content:"";position:absolute;inset:-20%;
+  background:
+    radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--accent) 30%, transparent) 0%, transparent 45%),
+    radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--accent-2) 26%, transparent) 0%, transparent 50%),
+    radial-gradient(circle at 50% 90%, color-mix(in srgb, var(--accent) 18%, transparent) 0%, transparent 55%),
+    linear-gradient(160deg, var(--bg1), var(--bg2) 55%, var(--bg3));
+  animation:drift 22s ease-in-out infinite alternate;
+  filter:saturate(1.1);
+}
+.bg-scene::after{
+  content:"";position:absolute;inset:0;opacity:.55;
+  background-image:radial-gradient(var(--grid-dot) 1.4px, transparent 1.4px);
+  background-size:26px 26px;
+  mask-image:radial-gradient(circle at 50% 30%, #000 0%, transparent 75%);
+}
+@keyframes drift{
+  0%{transform:translate3d(0,0,0) scale(1);}
+  100%{transform:translate3d(-2%,2%,0) scale(1.08);}
+}
+@media (prefers-reduced-motion: reduce){ .bg-scene::before{animation:none;} }
+
+/* ============ Navbar ============ */
+.navbar{padding:14px 20px;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:var(--glass);border-bottom:1px solid var(--glass-border);flex-wrap:wrap;gap:10px;}
+.brand{display:flex;align-items:center;gap:8px;}
+.brand-mark{width:30px;height:30px;flex-shrink:0;}
+.brand-name{font-weight:800;font-size:1.05rem;letter-spacing:.5px;}
+.contact-links{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.glow{color:var(--accent);text-decoration:none;font-weight:600;text-shadow:0 0 8px color-mix(in srgb, var(--accent) 60%, transparent);font-size:.85rem;transition:.3s;}
+.glow:hover{opacity:.8;}
+.sep{opacity:.4;}
+
+.controls-right{display:flex;align-items:center;gap:8px;}
+.icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--glass-border);background:var(--glass);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.25s;}
+.icon-btn:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.25);}
+.icon-btn svg{width:17px;height:17px;stroke:currentColor;}
+
+.lang-switcher{display:flex;background:var(--glass);border-radius:20px;padding:3px;border:1px solid var(--glass-border);}
+.lang-btn{background:transparent;border:none;color:var(--text);padding:5px 12px;border-radius:15px;cursor:pointer;font-size:.8rem;font-weight:700;transition:.3s ease;}
+.lang-btn.active{background:var(--accent);color:#00131a;box-shadow:0 0 10px color-mix(in srgb, var(--accent) 70%, transparent);}
+
+/* ============ Main layout ============ */
+.wrapper{flex:1;display:flex;justify-content:center;align-items:center;padding:24px 15px 10px;}
+.glass-card{
+  background:var(--glass);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  padding:26px;border-radius:28px;border:1px solid var(--glass-border);
+  text-align:center;width:100%;max-width:520px;box-shadow:var(--shadow);
+  animation:cardIn .55s cubic-bezier(.2,.7,.2,1) both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(18px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+.title{font-size:2.1rem;margin-bottom:2px;color:var(--text);font-weight:800;letter-spacing:.5px;}
+.tagline{font-size:.85rem;opacity:.7;margin-bottom:18px;letter-spacing:1px;}
+
+.reveal{animation:fadeUp .5s ease both;}
+.reveal:nth-of-type(1){animation-delay:.05s;}
+.reveal:nth-of-type(2){animation-delay:.1s;}
+.reveal:nth-of-type(3){animation-delay:.15s;}
+.reveal:nth-of-type(4){animation-delay:.2s;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+
+/* section headers with help icon */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin:14px 0 8px;text-align:start;}
+.section-head h3{font-size:.85rem;font-weight:700;color:var(--text-dim);letter-spacing:.3px;}
+.help-btn{width:20px;height:20px;border-radius:50%;border:1px solid var(--glass-border);background:var(--field-bg);color:var(--accent);font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:.2s;}
+.help-btn:hover{background:var(--accent);color:#00131a;transform:scale(1.08);}
+
+/* tabs */
+.tabs{display:flex;background:var(--field-bg);border-radius:14px;padding:4px;margin-bottom:14px;border:1px solid var(--glass-border);gap:4px;}
+.tab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:transparent;border:none;color:var(--text-dim);border-radius:10px;cursor:pointer;font-size:.85rem;font-weight:700;transition:.25s;}
+.tab.active{background:var(--glass-strong);color:var(--accent);box-shadow:0 4px 10px rgba(0,0,0,.18);}
+.tab svg{width:16px;height:16px;stroke:currentColor;}
+.tab:active{transform:scale(.97);}
+
+/* forms */
+.form-group{display:none;flex-direction:column;gap:10px;margin-bottom:6px;animation:fadeIn .3s ease;}
+.form-group.active{display:flex;}
+input[type="text"],input[type="password"],input[type="email"],select{
+  width:100%;padding:14px 16px;border-radius:14px;border:1px solid var(--glass-border);
+  background:var(--field-bg);color:var(--text);font-size:.95rem;outline:none;transition:.25s;
+}
+input::placeholder{color:var(--text-dim);}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);}
+.field-warning{font-size:.72rem;color:#ffb86b;text-align:start;display:none;padding:0 4px;}
+.field-warning.show{display:block;}
+
+/* customization grid */
+.options-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:10px;margin-bottom:6px;text-align:start;}
+.opt-group{display:flex;flex-direction:column;gap:5px;}
+.opt-group label{font-size:.75rem;opacity:.85;}
+input[type="color"]{background:var(--field-bg);border:1px solid var(--glass-border);padding:2px;border-radius:10px;height:38px;width:100%;cursor:pointer;}
+.upload-btn{background:var(--field-bg);color:var(--text);border:1px solid var(--glass-border);padding:9px;border-radius:10px;cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center;gap:5px;transition:.2s;height:38px;}
+.upload-btn:hover{background:var(--glass-strong);border-color:var(--accent);}
+.hint-note{font-size:.7rem;color:var(--text-dim);text-align:start;margin:2px 2px 10px;}
+
+/* qr zone */
+#qr-export-zone{display:flex;justify-content:center;align-items:center;margin:15px 0;min-height:200px;}
+#qr-wrapper{position:relative;display:inline-block;padding:20px;background:#ffffff;border-radius:18px;transition:all .3s ease;border:4px solid transparent;box-shadow:0 10px 30px rgba(0,0,0,.3);max-width:100%;}
+#qrcode{display:none;}
+#qrcode canvas,#qrcode img{display:block;margin:0 auto;max-width:100% !important;height:auto !important;}
+#qr-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;background:#fff;border-radius:8px;padding:3px;box-shadow:0 2px 10px rgba(0,0,0,.25);pointer-events:none;display:none;}
+.placeholder-text{color:rgba(0,0,0,.3);font-size:.9rem;font-weight:700;margin-top:80px;}
+
+.square{border-radius:18px !important;box-shadow:0 0 28px var(--neon);}
+.round{border-radius:50% !important;box-shadow:0 0 28px var(--neon);padding:32px !important;}
+
+/* action buttons */
+.action-buttons{display:none;gap:10px;flex-wrap:wrap;}
+.btn-action{flex:1;min-width:100px;display:flex;align-items:center;justify-content:center;gap:6px;border:none;padding:12px 15px;border-radius:12px;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s ease;}
+.btn-download{background:linear-gradient(45deg,var(--accent),var(--accent-2));color:#04121a;}
+.btn-secondary{background:var(--glass-strong);color:var(--text);border:1px solid var(--glass-border);}
+.btn-action:hover{transform:translateY(-2px);opacity:.92;}
+.btn-action:active{transform:translateY(0) scale(.98);}
+
+/* templates */
+.templates-row{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 10px;scroll-snap-type:x mandatory;}
+.template-card{flex:0 0 130px;scroll-snap-align:start;background:var(--field-bg);border:1px solid var(--glass-border);border-radius:16px;padding:8px;display:flex;flex-direction:column;gap:6px;align-items:center;}
+.template-card canvas{width:100%;border-radius:10px;background:#fff;}
+.template-card span{font-size:.7rem;color:var(--text-dim);}
+.template-card button{width:100%;font-size:.72rem;padding:7px;border-radius:8px;border:none;background:var(--accent);color:#04121a;font-weight:700;cursor:pointer;transition:.2s;}
+.template-card button:hover{opacity:.85;}
+
+/* toast */
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--glass-strong);backdrop-filter:blur(14px);color:var(--text);padding:12px 22px;border-radius:12px;border:1px solid var(--accent);box-shadow:0 10px 30px rgba(0,0,0,.4);opacity:0;transition:.3s ease;z-index:999;font-weight:600;pointer-events:none;max-width:90vw;text-align:center;}
+#toast.show{opacity:1;}
+
+/* modals (help + disclaimer) */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+.modal-overlay.show{display:flex;animation:fadeIn .25s ease;}
+.modal-box{background:var(--glass-strong);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--glass-border);border-radius:22px;padding:24px;max-width:380px;width:100%;box-shadow:var(--shadow);text-align:start;position:relative;animation:cardIn .3s ease both;color:var(--text);}
+.modal-box h4{font-size:1.05rem;margin-bottom:10px;color:var(--accent);}
+.modal-box p{font-size:.9rem;line-height:1.6;color:var(--text-dim);}
+.modal-close{position:absolute;top:12px;inset-inline-end:12px;width:28px;height:28px;border-radius:50%;border:1px solid var(--glass-border);background:var(--field-bg);color:var(--text);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{background:var(--accent);color:#04121a;}
+.disclaimer-box{text-align:center;}
+.disclaimer-box .dmark{width:46px;height:46px;margin:0 auto 12px;color:var(--accent);}
+.disclaimer-box a{color:var(--accent);font-weight:700;text-decoration:none;word-break:break-all;}
+.disclaimer-box a:hover{text-decoration:underline;}
+
+footer.footer{padding:14px;text-align:center;opacity:.6;font-size:.8rem;}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+
+/* ============ Mobile ============ */
+@media (max-width:600px){
+  .glass-card{padding:18px 12px;border-radius:20px;}
+  .title{font-size:1.75rem;}
+  .tagline{font-size:.75rem;margin-bottom:14px;}
+  .tabs{flex-wrap:wrap;gap:4px;}
+  .tab{flex:1 0 100%;font-size:.8rem;padding:9px;}
+  input[type="text"],input[type="password"],input[type="email"],select{padding:12px 14px;font-size:16px;}
+  .options-grid{grid-template-columns:1fr 1fr;gap:6px;}
+  .opt-group label{font-size:.7rem;}
+  .action-buttons{flex-direction:column;gap:8px;}
+  .btn-action{padding:14px;font-size:1rem;width:100%;}
+  #qr-wrapper{padding:12px;}
+  #qr-logo{width:35px;height:35px;}
+}
+@media (max-width:400px){
+  .navbar{justify-content:center;}
+  .contact-links{gap:5px;}
+  .glow{font-size:.7rem;}
+  .options-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-scene"></div>
+
+<nav class="navbar">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round">
+        <path d="M10 24V14a4 4 0 0 1 4-4h10"/>
+        <path d="M54 24V14a4 4 0 0 0-4-4H40"/>
+        <path d="M10 40v10a4 4 0 0 0 4 4h10"/>
+        <path d="M54 40v10a4 4 0 0 1-4 4H40"/>
+      </g>
+      <rect x="27" y="27" width="10" height="10" rx="2" fill="var(--accent)"/>
+    </svg>
+    <span class="brand-name">Ntlas</span>
+  </div>
+  <div class="contact-links">
+    <a href="https://wa.me/22230726475" class="glow" target="_blank">WhatsApp</a>
+    <span class="sep">|</span>
+    <a href="mailto:mohamed005cheikh@gmail.com" class="glow">mohamed005cheikh@gmail.com</a>
+  </div>
+  <div class="controls-right">
+    <button class="icon-btn" id="theme-toggle" onclick="toggleTheme()" aria-label="Theme">
+      <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <div class="lang-switcher">
+      <button id="btn-ar" class="lang-btn active" onclick="setLanguage('ar')">العربية</button>
+      <button id="btn-fr" class="lang-btn" onclick="setLanguage('fr')">Français</button>
+    </div>
+  </div>
+</nav>
+
+<main class="wrapper">
+  <div class="glass-card">
+    <h1 class="title">Ntlas</h1>
+    <p class="tagline">Scan . Connect . Simplify</p>
+
+    <div class="tabs reveal">
+      <button class="tab active" onclick="switchTab('text')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <span id="tab-lbl-text">رابط/نص</span>
+      </button>
+      <button class="tab" onclick="switchTab('wifi')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        <span id="tab-lbl-wifi">Wi-Fi</span>
+      </button>
+      <button class="tab" onclick="switchTab('vcard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="tab-lbl-vcard">جهة اتصال</span>
+      </button>
+      <button class="help-btn" style="align-self:center;margin-inline-start:4px;" onclick="openHelp('tabs')">?</button>
+    </div>
+
+    <div id="form-text" class="form-group active">
+      <input type="text" id="inp-text" placeholder="ألصق الرابط أو اكتب نصاً..." oninput="handleInput()">
+    </div>
+
+    <div id="form-wifi" class="form-group">
+      <input type="text" id="inp-wifi-ssid" placeholder="اسم الشبكة (SSID)" oninput="handleInput()">
+      <input type="password" id="inp-wifi-pass" placeholder="كلمة المرور" oninput="handleInput()">
+      <select id="inp-wifi-type" onchange="handleWifiTypeChange()">
+        <option value="WPA">حماية WPA/WPA2</option>
+        <option value="WEP">حماية WEP</option>
+        <option value="nopass">بدون كلمة مرور</option>
+      </select>
+    </div>
+
+    <div id="form-vcard" class="form-group">
+      <input type="text" id="inp-vc-name" placeholder="الاسم الكامل" oninput="handleInput()">
+      <input type="text" id="inp-vc-phone" placeholder="رقم الهاتف" oninput="handleInput()">
+      <input type="email" id="inp-vc-email" placeholder="البريد الإلكتروني (اختياري)" oninput="handleVcardEmail()">
+      <span class="field-warning" id="email-warning">صيغة البريد الإلكتروني غير صحيحة</span>
+    </div>
+
+    <div class="section-head reveal">
+      <h3 id="lbl-custom-head">التخصيص</h3>
+      <button class="help-btn" onclick="openHelp('custom')">?</button>
+    </div>
+    <div class="options-grid reveal">
+      <div class="opt-group">
+        <label id="lbl-frame">شكل الإطار:</label>
+        <select id="frame-type" onchange="applyStyle()">
+          <option value="none" id="opt-no-frame">بدون</option>
+          <option value="square" id="opt-square">مربع نيون</option>
+          <option value="round" id="opt-round">دائري نيون</option>
+        </select>
+      </div>
+      <div class="opt-group">
+        <label id="lbl-neon">لون النيون:</label>
+        <input type="color" id="frame-color" value="#00d2ff" onchange="applyStyle()">
+      </div>
+      <div class="opt-group">
+        <label id="lbl-qr-color">لون الرمز:</label>
+        <input type="color" id="qr-color" value="#000000" onchange="handleInput()">
+      </div>
+      <div class="opt-group">
+        <label id="lbl-logo">شعار الرمز:</label>
+        <label class="upload-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span id="lbl-upload-btn">تغيير</span>
+          <input type="file" id="logo-upload" accept="image/*" style="display:none" onchange="handleLogoUpload(event)">
+        </label>
+      </div>
+    </div>
+
+    <div class="section-head reveal">
+      <h3 id="lbl-export-head">جودة التصدير</h3>
+      <button class="help-btn" onclick="openHelp('export')">?</button>
+    </div>
+    <div class="options-grid reveal">
+      <div class="opt-group">
+        <label id="lbl-size">الحجم (px):</label>
+        <select id="export-size">
+          <option value="512">512</option>
+          <option value="1024" selected>1024</option>
+          <option value="2048">2048</option>
+        </select>
+      </div>
+      <div class="opt-group">
+        <label id="lbl-format">الصيغة:</label>
+        <select id="export-format" onchange="toggleQualityField()">
+          <option value="png">PNG</option>
+          <option value="jpeg">JPEG</option>
+        </select>
+      </div>
+      <div class="opt-group" id="quality-group" style="display:none;">
+        <label id="lbl-quality">الجودة:</label>
+        <input type="range" id="export-quality" min="0.4" max="1" step="0.05" value="0.92">
+      </div>
+    </div>
+    <p class="hint-note" id="export-note">ستبقى المعاينة كما هي — الحجم والجودة المختاران يُطبّقان عند التحميل فقط.</p>
+
+    <div id="qr-export-zone">
+      <div id="qr-wrapper">
+        <div id="placeholder" class="placeholder-text">أدخل البيانات لتوليد الرمز</div>
+        <div id="qrcode"></div>
+        <img src="" id="qr-logo" alt="Logo">
+      </div>
+    </div>
+
+    <div class="action-buttons" id="action-panel">
+      <button class="btn-action btn-download" onclick="downloadQR()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span id="txt-download">حفظ</span>
+      </button>
+      <button class="btn-action btn-secondary" onclick="shareQR()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span id="txt-share">مشاركة</span>
+      </button>
+      <button class="btn-action btn-secondary" onclick="copyQRImage()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span id="txt-copy">نسخ</span>
+      </button>
+    </div>
+
+    <div class="section-head reveal" style="margin-top:20px;">
+      <h3 id="lbl-templates-head">قوالب جاهزة</h3>
+      <button class="help-btn" onclick="openHelp('templates')">?</button>
+    </div>
+    <div class="templates-row reveal" id="templates-row"></div>
+  </div>
+</main>
+
+<footer class="footer">
+  <p>© 2026 Ntlas | Created by MC</p>
+  <!-- TODO (future feature): a subtle watermark option will be added to generated QR codes / templates.
+       Reserved: WATERMARK_ENABLED flag + watermarkText/watermarkOpacity settings. Not implemented yet. -->
+</footer>
+
+<div id="toast"></div>
+
+<!-- Help modal -->
+<div class="modal-overlay" id="help-overlay" onclick="closeHelpOnBackdrop(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeHelp()">✕</button>
+    <h4 id="help-title">Aide</h4>
+    <p id="help-text"></p>
+  </div>
+</div>
+
+<!-- Download disclaimer modal -->
+<div class="modal-overlay" id="disclaimer-overlay" onclick="closeDisclaimerOnBackdrop(event)">
+  <div class="modal-box disclaimer-box">
+    <button class="modal-close" onclick="closeDisclaimer()">✕</button>
+    <svg class="dmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s8-4.5 8-11V5l-8-3-8 3v6c0 6.5 8 11 8 11z"/><path d="M9 12l2 2 4-4"/></svg>
+    <p id="disclaimer-text">Nous avons rendu ce service 100% gratuit pour vous, utilisez-le à bon escient — je ne suis responsable de rien d'autre.</p>
+    <p style="margin-top:10px;"><a href="mailto:mohamed005cheikh@gmail.com">mohamed005cheikh@gmail.com</a></p>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   State
+   ============================================================ */
+let currentLang = 'ar';
+let currentTab = 'text';
+let qrInstance = null;
+let debounceTimer;
+let customLogoUrl = null; // null = no default logo file bundled; user can upload one
+
+/* ============================================================
+   Translations
+   ============================================================ */
+const translations = {
+  ar: {
+    tabText:"رابط/نص", tabWifi:"شبكة Wi-Fi", tabVcard:"جهة اتصال",
+    inpText:"ألصق الرابط أو اكتب نصاً...",
+    inpWifiSsid:"اسم الشبكة (SSID)", inpWifiPass:"كلمة المرور",
+    optWpa:"حماية WPA/WPA2", optWep:"حماية WEP", optNoPass:"بدون كلمة مرور",
+    inpVcName:"الاسم الكامل", inpVcPhone:"رقم الهاتف", inpVcEmail:"البريد الإلكتروني (اختياري)",
+    emailWarning:"صيغة البريد الإلكتروني غير صحيحة",
+    customHead:"التخصيص", lblFrame:"شكل الإطار:", optNoFrame:"بدون", optSquare:"مربع نيون", optRound:"دائري نيون",
+    lblNeon:"لون النيون:", lblQrColor:"لون الرمز:", lblLogo:"شعار الرمز:", lblUploadBtn:"تغيير",
+    exportHead:"جودة التصدير", lblSize:"الحجم (px):", lblFormat:"الصيغة:", lblQuality:"الجودة:",
+    exportNote:"ستبقى المعاينة كما هي — الحجم والجودة المختاران يُطبّقان عند التحميل فقط.",
+    placeholder:"أدخل البيانات لتوليد الرمز",
+    txtDownload:"حفظ", txtShare:"مشاركة", txtCopy:"نسخ",
+    templatesHead:"قوالب جاهزة",
+    tplUse:"إدراج رمزي QR",
+    tplNeedQr:"يرجى إنشاء رمز QR أولاً",
+    msgEmpty:"البيانات غير مكتملة", msgCopied:"تم النسخ بنجاح!", msgFail:"غير مدعوم في متصفحك",
+    helpTitle:"مساعدة",
+    templates:[
+      {label:"بطاقة عمل"},
+      {label:"ملصق / إعلان"},
+      {label:"منشور اجتماعي"}
+    ]
+  },
+  fr: {
+    tabText:"Lien/Texte", tabWifi:"Réseau Wi-Fi", tabVcard:"Contact",
+    inpText:"Collez le lien ou le texte...",
+    inpWifiSsid:"Nom du réseau (SSID)", inpWifiPass:"Mot de passe",
+    optWpa:"Sécurité WPA/WPA2", optWep:"Sécurité WEP", optNoPass:"Aucun mot de passe",
+    inpVcName:"Nom complet", inpVcPhone:"Numéro de tél.", inpVcEmail:"Email (optionnel)",
+    emailWarning:"Le format de l'email semble incorrect",
+    customHead:"Personnalisation", lblFrame:"Cadre :", optNoFrame:"Aucun", optSquare:"Carré néon", optRound:"Rond néon",
+    lblNeon:"Couleur néon :", lblQrColor:"Couleur du QR :", lblLogo:"Logo du QR :", lblUploadBtn:"Changer",
+    exportHead:"Qualité d'export", lblSize:"Taille (px) :", lblFormat:"Format :", lblQuality:"Qualité :",
+    exportNote:"L'aperçu reste identique — la taille et la qualité choisies s'appliquent uniquement au téléchargement.",
+    placeholder:"Entrez les données pour générer un QR",
+    txtDownload:"Télécharger", txtShare:"Partager", txtCopy:"Copier",
+    templatesHead:"Modèles prêts à l'emploi",
+    tplUse:"Insérer mon QR",
+    tplNeedQr:"Veuillez d'abord générer un QR code",
+    msgEmpty:"Données incomplètes", msgCopied:"Copié avec succès !", msgFail:"Non supporté par votre navigateur",
+    helpTitle:"Aide",
+    templates:[
+      {label:"Carte de visite"},
+      {label:"Affiche / Flyer"},
+      {label:"Post réseaux sociaux"}
+    ]
+  }
+};
+
+/* Help popup content — always in French, as requested */
+const helpTexts = {
+  tabs:"Choisissez le type de contenu à encoder : un lien ou texte libre, les identifiants d'un réseau Wi-Fi, ou une fiche de contact (vCard). Le QR code se met à jour automatiquement selon vos données.",
+  custom:"Personnalisez l'apparence du QR code : forme du cadre néon, couleur du cadre, couleur des modules du QR, et un logo optionnel affiché au centre du code.",
+  export:"Choisissez la résolution (512, 1024 ou 2048 px) et le format (PNG ou JPEG) utilisés uniquement au moment du téléchargement, du partage ou de la copie — l'aperçu à l'écran ne change pas.",
+  templates:"Générez d'abord votre QR code, puis appuyez sur « Insérer mon QR » sur un modèle pour télécharger une composition prête à l'emploi. Vous pouvez ensuite la modifier dans une application comme Canva depuis votre téléphone."
+};
+
+/* ============================================================
+   Theme
+   ============================================================ */
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  const icon = document.getElementById('theme-icon');
+  if(theme === 'light'){
+    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+  }else{
+    icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  }
+  try{ localStorage.setItem('ntlas-theme', theme); }catch(e){}
+}
+function toggleTheme(){
+  const cur = document.documentElement.getAttribute('data-theme');
+  applyTheme(cur === 'light' ? 'dark' : 'light');
+}
+(function initTheme(){
+  let saved = null;
+  try{ saved = localStorage.getItem('ntlas-theme'); }catch(e){}
+  if(!saved){
+    saved = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+  }
+  applyTheme(saved);
+})();
+
+/* ============================================================
+   Language
+   ============================================================ */
+function setLanguage(lang){
+  currentLang = lang;
+  const html = document.documentElement;
+  const t = translations[lang];
+
+  html.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+  html.setAttribute('lang', lang);
+
+  document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
+  document.getElementById('btn-fr').classList.toggle('active', lang === 'fr');
+
+  document.getElementById('tab-lbl-text').innerText = t.tabText;
+  document.getElementById('tab-lbl-wifi').innerText = t.tabWifi;
+  document.getElementById('tab-lbl-vcard').innerText = t.tabVcard;
+
+  document.getElementById('inp-text').placeholder = t.inpText;
+  document.getElementById('inp-wifi-ssid').placeholder = t.inpWifiSsid;
+  document.getElementById('inp-wifi-pass').placeholder = t.inpWifiPass;
+  document.getElementById('inp-wifi-type').options[0].text = t.optWpa;
+  document.getElementById('inp-wifi-type').options[1].text = t.optWep;
+  document.getElementById('inp-wifi-type').options[2].text = t.optNoPass;
+
+  document.getElementById('inp-vc-name').placeholder = t.inpVcName;
+  document.getElementById('inp-vc-phone').placeholder = t.inpVcPhone;
+  document.getElementById('inp-vc-email').placeholder = t.inpVcEmail;
+  document.getElementById('email-warning').innerText = t.emailWarning;
+
+  document.getElementById('lbl-custom-head').innerText = t.customHead;
+  document.getElementById('lbl-frame').innerText = t.lblFrame;
+  document.getElementById('opt-no-frame').innerText = t.optNoFrame;
+  document.getElementById('opt-square').innerText = t.optSquare;
+  document.getElementById('opt-round').innerText = t.optRound;
+  document.getElementById('lbl-neon').innerText = t.lblNeon;
+  document.getElementById('lbl-qr-color').innerText = t.lblQrColor;
+  document.getElementById('lbl-logo').innerText = t.lblLogo;
+  document.getElementById('lbl-upload-btn').innerText = t.lblUploadBtn;
+
+  document.getElementById('lbl-export-head').innerText = t.exportHead;
+  document.getElementById('lbl-size').innerText = t.lblSize;
+  document.getElementById('lbl-format').innerText = t.lblFormat;
+  document.getElementById('lbl-quality').innerText = t.lblQuality;
+  document.getElementById('export-note').innerText = t.exportNote;
+
+  document.getElementById('placeholder').innerText = t.placeholder;
+  document.getElementById('txt-download').innerText = t.txtDownload;
+  document.getElementById('txt-share').innerText = t.txtShare;
+  document.getElementById('txt-copy').innerText = t.txtCopy;
+
+  document.getElementById('lbl-templates-head').innerText = t.templatesHead;
+  renderTemplates();
+}
+
+/* ============================================================
+   Tabs
+   ============================================================ */
+function switchTab(tabId){
+  currentTab = tabId;
+  document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+  if(window.event && window.event.currentTarget) window.event.currentTarget.classList.add('active');
+
+  document.querySelectorAll('.form-group').forEach(f => f.classList.remove('active'));
+  document.getElementById('form-' + tabId).classList.add('active');
+
+  handleInput();
+}
+
+function handleWifiTypeChange(){
+  const type = document.getElementById('inp-wifi-type').value;
+  const passField = document.getElementById('inp-wifi-pass');
+  passField.style.display = (type === 'nopass') ? 'none' : 'block';
+  if(type === 'nopass') passField.value = '';
+  handleInput();
+}
+
+function handleVcardEmail(){
+  const val = document.getElementById('inp-vc-email').value.trim();
+  const warn = document.getElementById('email-warning');
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(val && !emailRegex.test(val)){
+    warn.classList.add('show');
+  }else{
+    warn.classList.remove('show');
+  }
+  handleInput();
+}
+
+/* ============================================================
+   Logo upload
+   ============================================================ */
+function handleLogoUpload(event){
+  const file = event.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(e){
+      customLogoUrl = e.target.result;
+      const logoImg = document.getElementById('qr-logo');
+      logoImg.src = customLogoUrl;
+      handleInput();
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+/* ============================================================
+   Data extraction
+   ============================================================ */
+function getQRData(){
+  if(currentTab === 'text'){
+    return document.getElementById('inp-text').value.trim();
+  }else if(currentTab === 'wifi'){
+    const ssid = document.getElementById('inp-wifi-ssid').value.trim();
+    const type = document.getElementById('inp-wifi-type').value;
+    const pass = (type === 'nopass') ? '' : document.getElementById('inp-wifi-pass').value.trim();
+    if(!ssid) return '';
+    return `WIFI:T:${type};S:${ssid};P:${pass};;`;
+  }else if(currentTab === 'vcard'){
+    const name = document.getElementById('inp-vc-name').value.trim();
+    const phone = document.getElementById('inp-vc-phone').value.trim();
+    const email = document.getElementById('inp-vc-email').value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const validEmail = email && emailRegex.test(email) ? email : '';
+    if(!name && !phone) return '';
+    return `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEMAIL:${validEmail}\nEND:VCARD`;
+  }
+  return '';
+}
+
+/* ============================================================
+   Generation
+   ============================================================ */
+function handleInput(){
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(generateQR, 350);
+}
+
+function generateQR(){
+  const data = getQRData();
+  const qrDiv = document.getElementById('qrcode');
+  const logoImg = document.getElementById('qr-logo');
+  const actionPanel = document.getElementById('action-panel');
+  const placeholder = document.getElementById('placeholder');
+  const qrColor = document.getElementById('qr-color').value;
+
+  if(!data){
+    qrDiv.style.display = 'none';
+    logoImg.style.display = 'none';
+    actionPanel.style.display = 'none';
+    placeholder.style.display = 'block';
+    return;
+  }
+
+  qrDiv.innerHTML = '';
+  const utf8Data = unescape(encodeURIComponent(data));
+
+  qrInstance = new QRCode(qrDiv, {
+    text: utf8Data,
+    width: 220,
+    height: 220,
+    colorDark: qrColor,
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  qrDiv.style.display = 'block';
+  actionPanel.style.display = 'flex';
+  placeholder.style.display = 'none';
+
+  if(customLogoUrl){
+    logoImg.src = customLogoUrl;
+    logoImg.style.display = 'block';
+  }else{
+    logoImg.style.display = 'none';
+  }
+  applyStyle();
+}
+
+function applyStyle(){
+  const frame = document.getElementById('frame-type').value;
+  const color = document.getElementById('frame-color').value;
+  const wrapper = document.getElementById('qr-wrapper');
+
+  wrapper.className = '';
+  wrapper.style.borderColor = 'transparent';
+  document.documentElement.style.setProperty('--neon', color);
+
+  if(frame !== 'none'){
+    wrapper.classList.add(frame);
+    wrapper.style.borderColor = color;
+  }
+}
+
+function toggleQualityField(){
+  const format = document.getElementById('export-format').value;
+  document.getElementById('quality-group').style.display = (format === 'jpeg') ? 'flex' : 'none';
+}
+
+/* ============================================================
+   Export (size / format / quality aware)
+   ============================================================ */
+function buildHighResQR(size, callback){
+  const data = getQRData();
+  if(!data) return;
+  const qrColor = document.getElementById('qr-color').value;
+  const utf8Data = unescape(encodeURIComponent(data));
+
+  const offscreen = document.createElement('div');
+  offscreen.style.position = 'fixed';
+  offscreen.style.left = '-9999px';
+  document.body.appendChild(offscreen);
+
+  new QRCode(offscreen, {
+    text: utf8Data,
+    width: size,
+    height: size,
+    colorDark: qrColor,
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  setTimeout(() => {
+    const canvas = offscreen.querySelector('canvas');
+    callback(canvas);
+    document.body.removeChild(offscreen);
+  }, 60);
+}
+
+function createExportCanvas(callback){
+  const size = parseInt(document.getElementById('export-size').value, 10);
+  buildHighResQR(size, (srcCanvas) => {
+    if(!srcCanvas) return;
+    const exportCanvas = document.createElement('canvas');
+    const ctx = exportCanvas.getContext('2d');
+    exportCanvas.width = srcCanvas.width;
+    exportCanvas.height = srcCanvas.height;
+
+    if(document.getElementById('export-format').value === 'jpeg'){
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+    }
+    ctx.drawImage(srcCanvas, 0, 0);
+
+    if(customLogoUrl){
+      const logoImg = document.getElementById('qr-logo');
+      const logoSize = Math.round(exportCanvas.width * 0.2);
+      const x = (exportCanvas.width - logoSize) / 2;
+      const y = (exportCanvas.height - logoSize) / 2;
+      const pad = Math.round(logoSize * 0.08);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      if(ctx.roundRect){ ctx.roundRect(x - pad, y - pad, logoSize + pad*2, logoSize + pad*2, 10); }
+      else{ ctx.rect(x - pad, y - pad, logoSize + pad*2, logoSize + pad*2); }
+      ctx.fill();
+      ctx.drawImage(logoImg, x, y, logoSize, logoSize);
+    }
+    callback(exportCanvas);
+  });
+}
+
+function canvasToDataURL(canvas){
+  const format = document.getElementById('export-format').value;
+  if(format === 'jpeg'){
+    const quality = parseFloat(document.getElementById('export-quality').value);
+    return canvas.toDataURL('image/jpeg', quality);
+  }
+  return canvas.toDataURL('image/png');
+}
+
+function downloadQR(){
+  if(!getQRData()) return;
+  createExportCanvas((canvas) => {
+    const format = document.getElementById('export-format').value;
+    const link = document.createElement('a');
+    link.href = canvasToDataURL(canvas);
+    link.download = `Ntlas-QR-${Date.now()}.${format === 'jpeg' ? 'jpg' : 'png'}`;
+    link.click();
+    showDisclaimer();
+  });
+}
+
+function copyQRImage(){
+  if(!getQRData()) return;
+  createExportCanvas((canvas) => {
+    canvas.toBlob((blob) => {
+      if(navigator.clipboard && window.ClipboardItem){
+        const item = new ClipboardItem({ 'image/png': blob });
+        navigator.clipboard.write([item])
+          .then(() => showToast(translations[currentLang].msgCopied))
+          .catch(() => showToast(translations[currentLang].msgFail));
+      }else{
+        showToast(translations[currentLang].msgFail);
+      }
+    });
+  });
+}
+
+function shareQR(){
+  if(!getQRData()) return;
+  createExportCanvas((canvas) => {
+    canvas.toBlob(async (blob) => {
+      const format = document.getElementById('export-format').value;
+      const file = new File([blob], `Ntlas-QR.${format === 'jpeg' ? 'jpg' : 'png'}`, { type: blob.type });
+      if(navigator.canShare && navigator.canShare({ files: [file] })){
+        try{
+          await navigator.share({ files: [file], title: 'Ntlas QR', text: 'Généré via Ntlas' });
+        }catch(err){ /* cancelled */ }
+      }else{
+        showToast(translations[currentLang].msgFail);
+      }
+    });
+  });
+}
+
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+/* ============================================================
+   Help modal
+   ============================================================ */
+function openHelp(key){
+  document.getElementById('help-title').innerText = translations[currentLang].helpTitle;
+  document.getElementById('help-text').innerText = helpTexts[key] || '';
+  document.getElementById('help-overlay').classList.add('show');
+}
+function closeHelp(){ document.getElementById('help-overlay').classList.remove('show'); }
+function closeHelpOnBackdrop(e){ if(e.target.id === 'help-overlay') closeHelp(); }
+
+/* ============================================================
+   Disclaimer modal
+   ============================================================ */
+function showDisclaimer(){
+  document.getElementById('disclaimer-overlay').classList.add('show');
+}
+function closeDisclaimer(){ document.getElementById('disclaimer-overlay').classList.remove('show'); }
+function closeDisclaimerOnBackdrop(e){ if(e.target.id === 'disclaimer-overlay') closeDisclaimer(); }
+
+/* ============================================================
+   Templates — drawn on canvas (no external image assets needed)
+   Each is a downloadable composition with a marked QR placement area.
+   ============================================================ */
+function drawTemplate(ctx, w, h, kind){
+  ctx.clearRect(0, 0, w, h);
+  if(kind === 0){ // business card
+    const grad = ctx.createLinearGradient(0,0,w,h);
+    grad.addColorStop(0, '#0c1626'); grad.addColorStop(1, '#123449');
+    ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+    ctx.fillStyle = '#00d2ff';
+    ctx.fillRect(0, h*0.86, w, h*0.14);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `bold ${h*0.09}px Cairo, sans-serif`;
+    ctx.fillText('Ntlas', w*0.06, h*0.22);
+    ctx.font = `${h*0.045}px Cairo, sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.fillText('votre-marque.com', w*0.06, h*0.32);
+    return { x: w*0.62, y: h*0.18, size: w*0.32 };
+  }else if(kind === 1){ // poster / flyer
+    const grad = ctx.createLinearGradient(0,0,w,h);
+    grad.addColorStop(0, '#1a0f2e'); grad.addColorStop(1, '#00263a');
+    ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `bold ${w*0.09}px Cairo, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('SCANNEZ-MOI', w/2, h*0.16);
+    ctx.textAlign = 'left';
+    return { x: w*0.28, y: h*0.28, size: w*0.44 };
+  }else{ // social square
+    const grad = ctx.createLinearGradient(0,0,w,h);
+    grad.addColorStop(0, '#00d2ff'); grad.addColorStop(1, '#7b5cff');
+    ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fillRect(0, h*0.78, w, h*0.22);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `bold ${h*0.06}px Cairo, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('Suivez-nous', w/2, h*0.9);
+    ctx.textAlign = 'left';
+    return { x: w*0.3, y: h*0.14, size: w*0.4 };
+  }
+}
+
+function renderTemplates(){
+  const row = document.getElementById('templates-row');
+  row.innerHTML = '';
+  const labels = translations[currentLang].templates;
+  const useLabel = translations[currentLang].tplUse;
+
+  for(let i = 0; i < 3; i++){
+    const card = document.createElement('div');
+    card.className = 'template-card';
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 260; canvas.height = 260;
+    drawTemplate(canvas.getContext('2d'), 260, 260, i);
+
+    const label = document.createElement('span');
+    label.innerText = labels[i].label;
+
+    const btn = document.createElement('button');
+    btn.innerText = useLabel;
+    btn.onclick = () => useTemplate(i);
+
+    card.appendChild(canvas);
+    card.appendChild(label);
+    card.appendChild(btn);
+    row.appendChild(card);
+  }
+}
+
+function useTemplate(kind){
+  if(!getQRData()){
+    showToast(translations[currentLang].tplNeedQr);
+    return;
+  }
+  const size = parseInt(document.getElementById('export-size').value, 10);
+  buildHighResQR(Math.min(size, 1024), (qrCanvas) => {
+    if(!qrCanvas) return;
+    const W = 1000, H = 1000;
+    const finalCanvas = document.createElement('canvas');
+    finalCanvas.width = W; finalCanvas.height = H;
+    const ctx = finalCanvas.getContext('2d');
+    const area = drawTemplate(ctx, W, H, kind);
+
+    ctx.fillStyle = '#ffffff';
+    const pad = area.size * 0.06;
+    ctx.fillRect(area.x - pad, area.y - pad, area.size + pad*2, area.size + pad*2);
+    ctx.drawImage(qrCanvas, area.x, area.y, area.size, area.size);
+
+    const link = document.createElement('a');
+    link.href = finalCanvas.toDataURL('image/png');
+    link.download = `Ntlas-Template-${kind+1}-${Date.now()}.png`;
+    link.click();
+    showDisclaimer();
+  });
+}
+
+/* ============================================================
+   Init
+   ============================================================ */
+document.getElementById('qr-logo').style.display = 'none';
+toggleQualityField();
+renderTemplates();
+</script>
+</body>
+  </html>
