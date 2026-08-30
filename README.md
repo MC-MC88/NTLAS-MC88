@@ -404,8 +404,7 @@ Pour toute question, suggestion ou bug :
 
 - **Email** : mohamed005cheikh@gmail.com
 - **WhatsApp** : +222 30 72 64 75
-- **Site** : Ntlas (application web)
 
 ---
 
-**Merci d'utiliser Ntlas !** 🎉
+**Merci d'utiliser Ntlas ! 🎉**
