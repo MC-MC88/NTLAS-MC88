@@ -17,7 +17,7 @@ Vous y générez des codes pour un lien, un réseau Wi-Fi, ou une carte de visit
 Tout se passe **dans votre navigateur**. Rien n'est envoyé, rien n'est enregistré ailleurs, rien ne vous est demandé en échange. Vous ouvrez la page, vous créez, vous téléchargez, vous fermez.
 
 ---
-
+<!-- 
 ## 📸 Un aperçu
 
 <div align="center">
@@ -43,7 +43,7 @@ Tout se passe **dans votre navigateur**. Rien n'est envoyé, rien n'est enregist
 </div>
 
 ---
-
+-->
 ## ✨ Ce que vous trouverez
 
 **Trois types de QR codes, pour trois usages.**  
