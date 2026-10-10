@@ -1,132 +1,198 @@
+<h2 id="français">🇫🇷 Version française</h2>
+
 <div align="center">
 
-# 📱 Ntlas
+# 🎯 Ntlas — MC88
 
-**Des QR codes beaux, utiles, et gratuits.**
+**Générateur de QR codes gratuit, dans le navigateur.**
 
 </div>
 
+🌍 **Langues :** [Français](#français) · [English](#english)
+
 ---
+
+> **En bref** — Ntlas génère des QR codes pour des liens, des réseaux Wi-Fi et des contacts, avec personnalisation et export.
+> 
+> **Gratuit · Sans API · Bilingue arabe/français**
+
+<!-- 
+## 📸 Aperçu
+
+<div align="center">
+  <img src="https://github.com/MC-MC88/[REPO]/raw/main/images/Sc1.png" alt="[Description]" width="100%" />
+</div>
+
+---
+
+🔗 **Démo en ligne :** [https://MC-MC88.github.io/[REPO]/](https://MC-MC88.github.io/[REPO]/)
+📦 **Code source :** [https://github.com/MC-MC88/[REPO]](https://github.com/MC-MC88/[REPO]/)
+-->
 
 ## 👋 Bienvenue
 
-Ntlas est un petit atelier pour créer des QR codes — sans compte, sans abonnement, sans filigrane.
-
-Vous y générez des codes pour un lien, un réseau Wi-Fi, ou une carte de visite. Vous les habillez à votre goût — un cadre néon, une couleur, votre logo au centre. Et vous repartez avec une image haute résolution, prête à imprimer, à afficher, ou à partager.
-
-Tout se passe **dans votre navigateur**. Rien n'est envoyé, rien n'est enregistré ailleurs, rien ne vous est demandé en échange. Vous ouvrez la page, vous créez, vous téléchargez, vous fermez.
+Ntlas est un fichier HTML unique. Il génère des QR codes directement dans le navigateur. Aucune inscription, aucune clé API, aucun serveur. Vous choisissez le type de contenu, vous personnalisez l'apparence, puis vous téléchargez ou partagez le résultat.
 
 ---
-<!-- 
-## 📸 Un aperçu
 
-<div align="center">
-  <img src="https://github.com/mohamed005cheikh-rgb/ntlas-mc88/raw/main/images/Sc1.png" alt="Générateur de QR code" width="100%" />
-</div>
-
-<br />
-
-<div align="center">
-  <img src="https://github.com/mohamed005cheikh-rgb/ntlas-mc88/raw/main/images/Sc2.png" alt="Personnalisation et modèles" width="100%" />
-</div>
-
-<br />
-
-<div align="center">
-  <img src="https://github.com/mohamed005cheikh-rgb/ntlas-mc88/raw/main/images/Sr1.gif" alt="Générer un QR code Wi-Fi" width="100%" />
-</div>
-
-<br />
-
-<div align="center">
-  <img src="https://github.com/mohamed005cheikh-rgb/ntlas-mc88/raw/main/images/Sr2.gif" alt="Personnaliser et télécharger" width="100%" />
-</div>
-
----
--->
 ## ✨ Ce que vous trouverez
 
-**Trois types de QR codes, pour trois usages.**  
-Un **lien ou un texte** — pour renvoyer vers une page, un formulaire, une vidéo. Un **réseau Wi-Fi** — vous entrez le nom du réseau et le mot de passe, et vos invités se connectent en le scannant, sans rien taper. Une **carte de visite** — nom, téléphone, email : le scan ajoute directement le contact au répertoire.
+**Trois types de contenu.**  
+Lien ou texte libre, identifiants Wi-Fi (SSID, mot de passe, type de sécurité), ou fiche contact vCard.
 
-**Une apparence que vous choisissez.**  
-Un cadre néon carré ou rond, ou pas de cadre du tout. La couleur du halo, la couleur des modules du QR code. Et si vous le souhaitez, votre logo — une petite image posée au centre, qui rendra le code reconnaissable au premier coup d'œil.
+**Personnalisation complète.**  
+Couleur du QR, cadre néon (aucun, carré ou rond), couleur du cadre, et logo central optionnel.
 
-**Une qualité d'impression réelle.**  
-Trois résolutions selon l'usage : 512 px pour une signature email ou un post, 1024 px pour un flyer ou une carte, 2048 px pour une affiche grand format. Le format au choix : PNG (sans perte, idéal pour les QR codes) ou JPEG (plus léger, si la taille du fichier compte plus que la fidélité).
+**Export en haute qualité.**  
+Tailles 512, 1024 ou 2048 px. Formats PNG ou JPEG avec réglage de qualité.
 
-**Des modèles prêts à l'emploi.**  
-Trois compositions déjà pensées — une carte de visite élégante, une affiche « SCANNEZ-MOI » avec le code au centre, un post carré aux couleurs douces pour les réseaux sociaux. Vous générez votre QR, vous cliquez, et le modèle se télécharge avec votre code déjà intégré.
+**Partage et copie.**  
+Boutons pour télécharger, partager via l'API native du système, ou copier l'image dans le presse-papiers.
 
-**Trois façons de repartir avec votre code.**  
-Téléchargez-le en haute résolution. Partagez-le directement depuis votre téléphone — vers WhatsApp, email, ou ce que vous voulez. Ou copiez-le dans le presse-papiers, et collez-le dans Word, Canva, ou n'importe quelle application.
-
-**Une interface en français ou en arabe.**  
-Le bouton en haut de page bascule toute l'interface d'une langue à l'autre, avec l'alignement qui s'adapte — de droite à gauche en arabe, de gauche à droite en français. Les fenêtres d'aide, elles, restent en français.
-
-**Un thème sombre, un thème clair.**  
-Au premier chargement, l'application regarde les préférences de votre système et s'y accorde. Ensuite, vous pouvez basculer à tout moment d'un clic — et votre choix est conservé pour la prochaine visite.
+**Cinq modèles prêts à l'emploi.**  
+Cartes de visite, affiches et posts pour réseaux sociaux. Le QR code est inséré automatiquement.
 
 ---
 
 ## 🧭 Comment ça marche
 
-**1. Choisissez un type.**  
-Trois onglets : *Lien / Texte*, *Wi-Fi*, ou *Contact*. Selon ce que vous voulez partager, c'est votre point de départ.
+**1. Choisissez un onglet.**  
+Lien/texte, Wi-Fi ou contact.
 
-**2. Entrez vos informations.**  
-Un lien, un nom de réseau et un mot de passe, ou les coordonnées d'une personne. Le code se génère tout seul au fur et à mesure que vous tapez.
+**2. Remplissez les champs.**  
+Le QR code se met à jour automatiquement.
 
-**3. Habillez-le.**  
-Ajoutez un cadre néon, choisissez une couleur, posez votre logo au centre si vous voulez. Tout se voit en direct sur l'aperçu.
+**3. Personnalisez l'apparence.**  
+Couleurs, cadre, logo et taille d'export.
 
-**4. Exportez.**  
-Choisissez la taille et le format, puis téléchargez. Ou partagez directement, ou copiez dans le presse-papiers — selon ce qui vous arrange.
+**4. Téléchargez ou partagez.**  
+Le fichier est généré dans votre navigateur.
 
-**Et si vous voulez un modèle ?**  
-Une fois votre QR code prêt, descendez à la section *Modèles*, et cliquez sur *Insérer mon QR* sous celui qui vous plaît. Le modèle se télécharge en PNG, avec votre code déjà en place. Vous pouvez ensuite l'ouvrir dans Canva ou un autre outil pour y ajouter vos propres textes.
+C'est tout. Aucune donnée n'est envoyée à un serveur.
 
 ---
 
 ## 🛠️ Petits coups de main
 
-**Le QR code ne se génère pas ?**  
-Vérifiez que le champ correspondant est bien rempli. Pour un Wi-Fi, par exemple, il faut au minimum un nom de réseau.
+**Faut-il une clé API ?**  
+Non. Tout fonctionne dans le navigateur.
 
-**Le bouton *Télécharger* ne répond pas ?**  
-La plupart du temps, aucun QR code n'a encore été généré. Remplissez les champs, laissez le code apparaître, puis réessayez.
+**Le site fonctionne-t-il hors ligne ?**  
+Oui, une fois la page chargée. La bibliothèque QR est chargée depuis un CDN au premier chargement.
 
-**Le logo ne s'affiche pas au centre ?**  
-Essayez avec une autre image. Les formats PNG et JPEG passent toujours. Si le fichier est corrompu ou dans un format inhabituel, le navigateur refusera de le lire.
+**Puis-je ajouter mon logo au centre ?**  
+Oui. Le logo est redimensionné automatiquement et un fond blanc est ajouté derrière lui.
 
-**Le QR code Wi-Fi ne fonctionne pas au scan ?**  
-Vérifiez que le nom du réseau (SSID) est bien identique à celui de votre box — majuscules, espaces, caractères spéciaux compris. Le type de sécurité doit aussi correspondre : WPA/WPA2 pour la plupart des réseaux modernes, WEP pour les anciens, ou « sans mot de passe » si le réseau est ouvert.
+**Les données saisies sont-elles envoyées quelque part ?**  
+Non. Tout reste dans votre navigateur.
 
-**Le partage ne s'ouvre pas sur mon appareil ?**  
-Tous les navigateurs ne proposent pas le partage direct de fichiers. Le plus souvent, le bouton *Télécharger* fait parfaitement le travail — vous partagez ensuite le fichier manuellement. Sur mobile, Chrome s'en sort très bien.
+---
 
-**La copie dans le presse-papiers échoue ?**  
-Certains navigateurs ne gèrent pas la copie d'images. Utilisez le téléchargement à la place, ou ouvrez la page dans Chrome ou Edge.
+<br /><br /><br />
 
-**Le thème revient toujours à son état initial ?**  
-Vous êtes probablement en navigation privée, où rien n'est conservé entre les sessions. En fenêtre normale, votre choix reste enregistré.
+<h2 id="english">🇬🇧 English version</h2>
 
-**La langue ne change pas ?**  
-Rechargez la page avec `Ctrl+F5` (Windows) ou `Cmd+Shift+R` (Mac) pour forcer la mise à jour. Si rien ne change, vérifiez que JavaScript est activé dans votre navigateur.
+<div align="center">
+
+# 🎯 Ntlas — MC88
+
+**Free QR code generator, in the browser.**
+
+</div>
+
+🌍 **Languages:** [Français](#français) · [English](#english)
+
+---
+
+> **In short** — Ntlas generates QR codes for links, Wi-Fi networks and contacts, with customization and export.
+> 
+> **Free · No API · Arabic/French bilingual**
+
+<!-- 
+## 📸 Preview
+
+<div align="center">
+  <img src="https://github.com/MC-MC88/[REPO]/raw/main/images/Sc1.png" alt="[Description]" width="100%" />
+</div>
+
+---
+
+🔗 **Live demo:** [https://MC-MC88.github.io/[REPO]/](https://MC-MC88.github.io/[REPO]/)
+📦 **Source code:** [https://github.com/MC-MC88/[REPO]](https://github.com/MC-MC88/[REPO]/)
+-->
+
+## 👋 Welcome
+
+Ntlas is a single HTML file. It generates QR codes directly in the browser. No sign-up, no API key, no server. You choose the content type, you customize the appearance, then you download or share the result.
+
+---
+
+## ✨ What you'll find
+
+**Three content types.**  
+Link or free text, Wi-Fi credentials (SSID, password, security type), or vCard contact card.
+
+**Full customization.**  
+QR color, neon frame (none, square or round), frame color, and optional center logo.
+
+**High-quality export.**  
+Sizes 512, 1024 or 2048 px. PNG or JPEG formats with quality control.
+
+**Share and copy.**  
+Buttons to download, share via the system's native API, or copy the image to the clipboard.
+
+**Five ready-made templates.**  
+Business cards, posters and social media posts. The QR code is inserted automatically.
+
+---
+
+## 🧭 How it works
+
+**1. Pick a tab.**  
+Link/text, Wi-Fi or contact.
+
+**2. Fill in the fields.**  
+The QR code updates automatically.
+
+**3. Customize the appearance.**  
+Colors, frame, logo and export size.
+
+**4. Download or share.**  
+The file is generated in your browser.
+
+That's it. No data is sent to a server.
+
+---
+
+## 🛠️ A little help
+
+**Do I need an API key?**  
+No. Everything runs in the browser.
+
+**Does it work offline?**  
+Yes, once the page is loaded. The QR library loads from a CDN on first load.
+
+**Can I add my logo in the center?**  
+Yes. The logo is resized automatically and a white background is added behind it.
+
+**Is the data I enter sent anywhere?**  
+No. Everything stays in your browser.
 
 ---
 
 <div align="center">
 
-### 📞 Une question, une idée ?
+### 📞 Une question, une idée ? / A question, an idea?
 
 [![Email](https://img.shields.io/badge/Email-mohamed005cheikh@gmail.com-d14836?style=flat-square&logo=gmail&logoColor=white)](mailto:mohamed005cheikh@gmail.com)
 [![WhatsApp](https://img.shields.io/badge/WhatsApp-+222_30_72_64_75-25D366?style=flat-square&logo=whatsapp&logoColor=white)](https://wa.me/22230726475)
+[![GitHub](https://img.shields.io/badge/GitHub-MC--MC88-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/MC-MC88)
+[![Portfolio](https://img.shields.io/badge/Portfolio-MC88-000?style=flat-square&logo=github&logoColor=white)](https://MC-MC88.github.io/MC88/)
 
 <br />
 
-*Bonne création.*
+*Scannez, connectez / Scan, connect*
 
-<sub>© 2026 Mohamed Cheikh — MC88</sub>
+<sub>MIT License · © 2026 Mohamed Cheikh — MC88</sub>
 
 </div>
